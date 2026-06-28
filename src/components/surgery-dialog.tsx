@@ -16,14 +16,12 @@ import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
-import { COMMON_SURGERIES, formatDateForInput, type SurgeryRecord } from '@/lib/surgery'
+import { formatDateForInput, type SurgeryRecord } from '@/lib/surgery'
 import { createSurgery, updateSurgery } from '@/lib/api-client'
 
 interface SurgeryDialogProps {
@@ -38,8 +36,6 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
   const [patientName, setPatientName] = React.useState('')
   const [village, setVillage] = React.useState('')
   const [surgeryName, setSurgeryName] = React.useState('')
-  const [customSurgery, setCustomSurgery] = React.useState('')
-  const [isCustom, setIsCustom] = React.useState(false)
   const [surgeryDate, setSurgeryDate] = React.useState('')
   const [surgeryCharge, setSurgeryCharge] = React.useState('')
   const [notes, setNotes] = React.useState('')
@@ -52,10 +48,7 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
     if (record) {
       setPatientName(record.patientName)
       setVillage(record.village)
-      const known = COMMON_SURGERIES.includes(record.surgeryName)
-      setIsCustom(!known)
-      setSurgeryName(known ? record.surgeryName : '')
-      setCustomSurgery(known ? '' : record.surgeryName)
+      setSurgeryName(record.surgeryName)
       setSurgeryDate(formatDateForInput(record.surgeryDate))
       setSurgeryCharge(String(record.surgeryCharge))
       setNotes(record.notes || '')
@@ -64,8 +57,6 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
       setPatientName('')
       setVillage('')
       setSurgeryName('')
-      setCustomSurgery('')
-      setIsCustom(false)
       setSurgeryDate(new Date().toISOString().slice(0, 10))
       setSurgeryCharge('')
       setNotes('')
@@ -79,7 +70,7 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
       setError('Patient name and village are required.')
       return
     }
-    const finalSurgery = isCustom ? customSurgery.trim() : surgeryName
+    const finalSurgery = surgeryName.trim()
     if (!finalSurgery) {
       setError('Surgery name is required.')
       return
@@ -142,39 +133,15 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="edit-surgery">Surgery Name</Label>
-              {!isCustom ? (
-                <Select
-                  value={surgeryName}
-                  onValueChange={(v) => {
-                    if (v === '__custom__') {
-                      setIsCustom(true)
-                      setSurgeryName('')
-                    } else {
-                      setSurgeryName(v)
-                    }
-                  }}
-                  disabled={saving}
-                >
-                  <SelectTrigger id="edit-surgery" className="w-full">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Common</SelectLabel>
-                      {COMMON_SURGERIES.map((s) => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                      <SelectLabel>Other</SelectLabel>
-                      <SelectItem value="__custom__">+ Custom...</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <div className="flex gap-2">
-                  <Input value={customSurgery} onChange={(e) => setCustomSurgery(e.target.value)} disabled={saving} placeholder="Custom surgery" />
-                  <Button type="button" variant="outline" size="sm" onClick={() => { setIsCustom(false); setCustomSurgery('') }} disabled={saving}>List</Button>
-                </div>
-              )}
+              <Input
+                id="edit-surgery"
+                placeholder="Type the surgery name"
+                value={surgeryName}
+                onChange={(e) => setSurgeryName(e.target.value)}
+                disabled={saving}
+                autoComplete="off"
+                autoCapitalize="words"
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="edit-date">Surgery Date</Label>

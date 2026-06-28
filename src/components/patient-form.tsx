@@ -6,17 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Hospital as HospitalIcon, Building2, Loader2, Save, Stethoscope, UserPlus } from 'lucide-react'
-import { COMMON_SURGERIES } from '@/lib/surgery'
 import { createSurgery } from '@/lib/api-client'
 import { toast } from 'sonner'
 import type { SurgeryRecord } from '@/lib/surgery'
@@ -31,8 +21,6 @@ export function PatientForm({ onSaved }: PatientFormProps) {
   const [patientName, setPatientName] = React.useState('')
   const [village, setVillage] = React.useState('')
   const [surgeryName, setSurgeryName] = React.useState('')
-  const [customSurgery, setCustomSurgery] = React.useState('')
-  const [isCustom, setIsCustom] = React.useState(false)
   const [surgeryDate, setSurgeryDate] = React.useState(() => new Date().toISOString().slice(0, 10))
   const [surgeryCharge, setSurgeryCharge] = React.useState('')
   const [notes, setNotes] = React.useState('')
@@ -46,8 +34,6 @@ export function PatientForm({ onSaved }: PatientFormProps) {
       patientName,
       village,
       surgeryName,
-      customSurgery,
-      isCustom,
       surgeryDate,
       surgeryCharge,
       notes,
@@ -56,7 +42,7 @@ export function PatientForm({ onSaved }: PatientFormProps) {
     try {
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(draft))
     } catch {}
-  }, [patientName, village, surgeryName, customSurgery, isCustom, surgeryDate, surgeryCharge, notes, selectedHospital])
+  }, [patientName, village, surgeryName, surgeryDate, surgeryCharge, notes, selectedHospital])
 
   // Restore draft on mount (single-pass)
   React.useEffect(() => {
@@ -67,8 +53,6 @@ export function PatientForm({ onSaved }: PatientFormProps) {
         if (d.patientName) setPatientName(d.patientName)
         if (d.village) setVillage(d.village)
         if (d.surgeryName) setSurgeryName(d.surgeryName)
-        if (d.customSurgery) setCustomSurgery(d.customSurgery)
-        if (typeof d.isCustom === 'boolean') setIsCustom(d.isCustom)
         if (d.surgeryDate) setSurgeryDate(d.surgeryDate)
         if (d.surgeryCharge) setSurgeryCharge(String(d.surgeryCharge))
         if (d.notes) setNotes(d.notes)
@@ -82,7 +66,7 @@ export function PatientForm({ onSaved }: PatientFormProps) {
   async function handleSubmit(hospital: 'Sadvichar' | 'Other') {
     setSelectedHospital(hospital)
     const finalHospital = hospital
-    const finalSurgery = isCustom ? customSurgery.trim() : surgeryName
+    const finalSurgery = surgeryName.trim()
     const e: Record<string, string> = {}
     if (!patientName.trim()) e.patientName = 'Patient name is required'
     if (!village.trim()) e.village = 'Village name is required'
@@ -121,8 +105,6 @@ export function PatientForm({ onSaved }: PatientFormProps) {
       setPatientName('')
       setVillage('')
       setSurgeryName('')
-      setCustomSurgery('')
-      setIsCustom(false)
       setSurgeryDate(new Date().toISOString().slice(0, 10))
       setSurgeryCharge('')
       setNotes('')
@@ -195,58 +177,15 @@ export function PatientForm({ onSaved }: PatientFormProps) {
             <Label htmlFor="surgery">
               Surgery Name <span className="text-destructive">*</span>
             </Label>
-            {!isCustom ? (
-              <Select
-                value={surgeryName}
-                onValueChange={(v) => {
-                  if (v === '__custom__') {
-                    setIsCustom(true)
-                    setSurgeryName('')
-                  } else {
-                    setSurgeryName(v)
-                  }
-                }}
-                disabled={saving}
-              >
-                <SelectTrigger id="surgery" className="w-full">
-                  <SelectValue placeholder="Select a surgery" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Common Surgeries</SelectLabel>
-                    {COMMON_SURGERIES.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                    <SelectLabel>Other</SelectLabel>
-                    <SelectItem value="__custom__">+ Custom Surgery...</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            ) : (
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Type custom surgery name"
-                  value={customSurgery}
-                  onChange={(e) => setCustomSurgery(e.target.value)}
-                  disabled={saving}
-                  autoFocus
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setIsCustom(false)
-                    setCustomSurgery('')
-                  }}
-                  disabled={saving}
-                >
-                  List
-                </Button>
-              </div>
-            )}
+            <Input
+              id="surgery"
+              placeholder="Type the surgery name"
+              value={surgeryName}
+              onChange={(e) => setSurgeryName(e.target.value)}
+              disabled={saving}
+              autoComplete="off"
+              autoCapitalize="words"
+            />
             {errors.surgeryName && <p className="text-xs text-destructive">{errors.surgeryName}</p>}
           </div>
           <div className="space-y-2">
