@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { calculateCommission } from '@/lib/surgery'
-import { getSessionUser } from '@/lib/auth'
 
 // GET /api/surgeries — list with optional filters
 export async function GET(req: NextRequest) {

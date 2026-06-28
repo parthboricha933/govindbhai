@@ -159,7 +159,7 @@ export function ReportsView({ refreshKey }: ReportsViewProps) {
           <Card className="shadow-sm border-border/60">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Total Revenue</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Other Hospital Charges</p>
                 <IndianRupee className="size-4 text-success" />
               </div>
               <p className="text-2xl font-bold text-success">{formatINR(report.totalRevenue)}</p>
@@ -177,7 +177,7 @@ export function ReportsView({ refreshKey }: ReportsViewProps) {
           <Card className="shadow-sm border-border/60">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Avg. Charge</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Avg. Charge (Other)</p>
                 <BarChart3 className="size-4 text-muted-foreground" />
               </div>
               <p className="text-2xl font-bold">{formatINR(report.averageCharge)}</p>
@@ -186,7 +186,7 @@ export function ReportsView({ refreshKey }: ReportsViewProps) {
           <Card className="shadow-sm border-border/60">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Highest</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Highest (Other)</p>
                 <TrendingUp className="size-4 text-success" />
               </div>
               <p className="text-2xl font-bold text-success">{formatINR(report.highestCharge)}</p>
@@ -195,7 +195,7 @@ export function ReportsView({ refreshKey }: ReportsViewProps) {
           <Card className="shadow-sm border-border/60">
             <CardContent className="p-5">
               <div className="flex items-center justify-between mb-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Lowest</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Lowest (Other)</p>
                 <TrendingDown className="size-4 text-destructive" />
               </div>
               <p className="text-2xl font-bold text-destructive">{formatINR(report.lowestCharge)}</p>

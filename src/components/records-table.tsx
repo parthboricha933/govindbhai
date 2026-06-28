@@ -338,7 +338,13 @@ export function RecordsTable({ refreshKey, onChange, compact, hideFilters, pageS
                         {r.hospital === 'Sadvichar' ? 'Sadvichar' : 'Other'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right font-medium whitespace-nowrap">{formatINR(r.surgeryCharge)}</TableCell>
+                    <TableCell className="text-right font-medium whitespace-nowrap">
+                      {r.hospital === 'Sadvichar' ? (
+                        <span className="text-muted-foreground">—</span>
+                      ) : (
+                        formatINR(r.surgeryCharge)
+                      )}
+                    </TableCell>
                     <TableCell className="text-right whitespace-nowrap">
                       {r.commission > 0 ? (
                         <span className="text-amber-600 dark:text-amber-400 font-medium">{formatINR(r.commission)}</span>

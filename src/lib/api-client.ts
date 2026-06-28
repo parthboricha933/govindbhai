@@ -120,23 +120,3 @@ export async function fetchAnalytics(filters: SurgeryFilters = {}): Promise<Anal
 export function exportUrl(format: 'csv' | 'excel' | 'pdf', filters: SurgeryFilters = {}): string {
   return `/api/export?format=${format}${qs(filters).replace(/^\?/, '&')}`
 }
-
-export async function login(username: string, password: string): Promise<boolean> {
-  const res = await fetch('/api/auth/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  })
-  if (!res.ok) return false
-  return true
-}
-
-export async function logout(): Promise<void> {
-  await fetch('/api/auth/logout', { method: 'POST' })
-}
-
-export async function getSession(): Promise<{ authenticated: boolean; username: string | null }> {
-  const res = await fetch('/api/auth/session', { cache: 'no-store' })
-  if (!res.ok) return { authenticated: false, username: null }
-  return res.json()
-}

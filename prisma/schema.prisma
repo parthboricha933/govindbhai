@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -17,7 +17,7 @@ model Surgery {
   surgeryName   String
   surgeryDate   DateTime
   hospital      String   // "Sadvichar" | "Other"
-  surgeryCharge Float    // in INR
+  surgeryCharge Float    // in INR (0 for Sadvichar, actual charge for Other)
   commission    Float    // 500 for Other hospital, 0 for Sadvichar
   notes         String?
   createdAt     DateTime @default(now())
@@ -27,12 +27,4 @@ model Surgery {
   @@index([hospital])
   @@index([village])
   @@index([surgeryName])
-}
-
-model AdminUser {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

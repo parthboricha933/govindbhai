@@ -148,9 +148,9 @@ export function AnalyticsView({ refreshKey }: AnalyticsViewProps) {
         <Card className="shadow-sm border-border/60">
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <Hospital className="size-4 text-primary" /> Hospital-wise Revenue
+              <Hospital className="size-4 text-primary" /> Hospital-wise Charges
             </CardTitle>
-            <CardDescription>Revenue by hospital (₹)</CardDescription>
+            <CardDescription>Total charges billed at each hospital (₹) — Sadvichar shows ₹0 since no charge is recorded there.</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={280}>

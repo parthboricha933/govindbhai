@@ -104,9 +104,12 @@ export async function GET(req: NextRequest) {
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
 
-  // Report stats
-  const charges = all.map((r) => r.surgeryCharge)
-  const averageCharge = charges.length ? totalRevenue / charges.length : 0
+  // Report stats — charge stats only consider Other Hospital records
+  // (Sadvichar Hospital surgeries have no charge recorded, since you work there)
+  const otherRecords = all.filter((r) => r.hospital === 'Other')
+  const charges = otherRecords.map((r) => r.surgeryCharge)
+  const otherTotalRevenue = charges.reduce((s, c) => s + c, 0)
+  const averageCharge = charges.length ? otherTotalRevenue / charges.length : 0
   const highestCharge = charges.length ? Math.max(...charges) : 0
   const lowestCharge = charges.length ? Math.min(...charges) : 0
 
@@ -124,7 +127,7 @@ export async function GET(req: NextRequest) {
     },
     report: {
       totalSurgeries,
-      totalRevenue,
+      totalRevenue: otherTotalRevenue,
       totalCommission,
       averageCharge,
       highestCharge,
