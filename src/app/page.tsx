@@ -23,6 +23,7 @@ import { RecordsTable } from '@/components/records-table'
 import { ReportsView } from '@/components/reports-view'
 import { AnalyticsView } from '@/components/analytics-view'
 import { HospitalSummary } from '@/components/hospital-summary'
+import { InstallButton } from '@/components/install-button'
 import { fetchAnalytics, type AnalyticsResponse } from '@/lib/api-client'
 import type { DashboardStats } from '@/lib/surgery'
 
@@ -95,6 +96,7 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center gap-1">
+              <InstallButton variant="outline" size="sm" />
               <Button
                 variant="ghost"
                 size="icon"
