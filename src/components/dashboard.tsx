@@ -1,7 +1,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Activity, Building2, CalendarDays, CalendarRange, Coins, Hospital, IndianRupee, Stethoscope, TrendingUp } from 'lucide-react'
+import { Activity, Building2, CalendarDays, CalendarRange, Coins, Hospital, IndianRupee, Stethoscope, TrendingUp, Wallet } from 'lucide-react'
 import type { DashboardStats } from '@/lib/surgery'
 import { formatINR } from '@/lib/surgery'
 
@@ -47,7 +47,7 @@ export function Dashboard({ stats, loading }: DashboardProps) {
   if (loading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {Array.from({ length: 9 }).map((_, i) => (
+        {Array.from({ length: 7 }).map((_, i) => (
           <Card key={i} className="shadow-sm border-border/60">
             <CardContent className="p-5">
               <div className="h-4 w-20 bg-muted rounded mb-3 animate-pulse" />
@@ -77,43 +77,32 @@ export function Dashboard({ stats, loading }: DashboardProps) {
           accent="primary"
         />
         <StatCard
-          title="Total Revenue"
-          value={formatINR(stats.totalRevenue)}
-          icon={<IndianRupee className="size-5" />}
-          accent="success"
-        />
-        <StatCard
           title="Sadvichar Surgeries"
           value={stats.sadvicharSurgeries.toLocaleString('en-IN')}
-          sub={`${formatINR(stats.sadvicharRevenue)} revenue`}
+          sub="Performed at Sadvichar"
           icon={<Hospital className="size-5" />}
           accent="primary"
         />
         <StatCard
-          title="Sadvichar Revenue"
-          value={formatINR(stats.sadvicharRevenue)}
-          icon={<TrendingUp className="size-5" />}
-          accent="success"
-        />
-        <StatCard
           title="Other Hospital"
           value={stats.otherSurgeries.toLocaleString('en-IN')}
-          sub={`${formatINR(stats.otherRevenue)} revenue`}
+          sub="Performed elsewhere"
           icon={<Building2 className="size-5" />}
-          accent="primary"
+          accent="warning"
         />
         <StatCard
-          title="Other Revenue"
-          value={formatINR(stats.otherRevenue)}
-          icon={<TrendingUp className="size-5" />}
+          title="Total Cash Earned"
+          value={formatINR(stats.totalCommission)}
+          sub="₹500 × Other Hospital"
+          icon={<Wallet className="size-5" />}
           accent="success"
         />
         <StatCard
-          title="Commission Earned"
-          value={formatINR(stats.totalCommission)}
-          sub="₹500 × Other Hospital"
-          icon={<Coins className="size-5" />}
-          accent="warning"
+          title="Other Hospital Charges"
+          value={formatINR(stats.otherRevenue)}
+          sub="Total billed at Other"
+          icon={<IndianRupee className="size-5" />}
+          accent="muted"
         />
         <StatCard
           title="Today's Surgeries"
@@ -127,47 +116,49 @@ export function Dashboard({ stats, loading }: DashboardProps) {
           icon={<CalendarRange className="size-5" />}
           accent="muted"
         />
+        <StatCard
+          title="Commission Rate"
+          value="₹500"
+          sub="Per Other Hospital surgery"
+          icon={<Coins className="size-5" />}
+          accent="warning"
+        />
       </div>
 
-      {/* Hospital comparison */}
+      {/* Hospital comparison — two clear sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="shadow-sm border-primary/20">
+        {/* Sadvichar Hospital — count only */}
+        <Card className="shadow-sm border-primary/30 bg-primary/5">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Hospital className="size-4 text-primary" /> Sadvichar Hospital
             </CardTitle>
-            <CardDescription>Surgeries performed at Sadvichar Hospital.</CardDescription>
+            <CardDescription>Surgeries you performed at Sadvichar (no charge — you work here).</CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-xs text-muted-foreground uppercase">Surgeries</p>
-              <p className="text-2xl font-bold">{stats.sadvicharSurgeries.toLocaleString('en-IN')}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase">Revenue</p>
-              <p className="text-2xl font-bold text-success">{formatINR(stats.sadvicharRevenue)}</p>
-            </div>
+          <CardContent>
+            <p className="text-xs text-muted-foreground uppercase">Number of Surgeries</p>
+            <p className="text-4xl font-bold text-primary">{stats.sadvicharSurgeries.toLocaleString('en-IN')}</p>
+            <p className="text-xs text-muted-foreground mt-2">No charge recorded for in-house surgeries.</p>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border-amber-500/30">
+
+        {/* Other Hospital — count + total cash paid (commission) */}
+        <Card className="shadow-sm border-amber-500/30 bg-amber-500/5">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-base">
               <Building2 className="size-4 text-amber-600" /> Other Hospital
             </CardTitle>
             <CardDescription>Surgeries performed at other hospitals (₹500 commission each).</CardDescription>
           </CardHeader>
-          <CardContent className="grid grid-cols-3 gap-4">
+          <CardContent className="space-y-3">
             <div>
-              <p className="text-xs text-muted-foreground uppercase">Surgeries</p>
-              <p className="text-2xl font-bold">{stats.otherSurgeries.toLocaleString('en-IN')}</p>
+              <p className="text-xs text-muted-foreground uppercase">Number of Surgeries</p>
+              <p className="text-4xl font-bold">{stats.otherSurgeries.toLocaleString('en-IN')}</p>
             </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase">Revenue</p>
-              <p className="text-2xl font-bold">{formatINR(stats.otherRevenue)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground uppercase">Commission</p>
-              <p className="text-2xl font-bold text-amber-600">{formatINR(stats.totalCommission)}</p>
+            <div className="border-t border-amber-500/20 pt-3">
+              <p className="text-xs text-muted-foreground uppercase">Total Cash Paid to Sadvichar</p>
+              <p className="text-4xl font-bold text-amber-600">{formatINR(stats.totalCommission)}</p>
+              <p className="text-xs text-muted-foreground mt-1">₹500 × {stats.otherSurgeries} surgeries</p>
             </div>
           </CardContent>
         </Card>

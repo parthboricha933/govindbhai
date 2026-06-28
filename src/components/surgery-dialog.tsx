@@ -84,20 +84,27 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
       setError('Surgery name is required.')
       return
     }
-    if (!surgeryDate || !surgeryCharge || Number(surgeryCharge) < 0) {
-      setError('Date and charge are required.')
+    if (!surgeryDate) {
+      setError('Surgery date is required.')
+      return
+    }
+    // Charge is required ONLY for Other Hospital.
+    // For Sadvichar Hospital the charge is always 0 (user works there).
+    if (hospital === 'Other' && (!surgeryCharge || Number(surgeryCharge) < 0)) {
+      setError('Surgery charge is required for Other Hospital.')
       return
     }
     setSaving(true)
     setError(null)
     try {
+      const finalCharge = hospital === 'Sadvichar' ? 0 : Number(surgeryCharge)
       const payload = {
         patientName: patientName.trim(),
         village: village.trim(),
         surgeryName: finalSurgery,
         surgeryDate,
         hospital,
-        surgeryCharge: Number(surgeryCharge),
+        surgeryCharge: finalCharge,
         notes: notes.trim(),
       }
       const saved = isEdit && record
@@ -188,13 +195,17 @@ export function SurgeryDialog({ open, onOpenChange, record, onSaved }: SurgeryDi
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="edit-charge">Surgery Charge (₹)</Label>
+              <Label htmlFor="edit-charge">
+                Surgery Charge (₹) <span className="text-muted-foreground text-xs font-normal">— Other only</span>
+              </Label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₹</span>
                 <Input id="edit-charge" type="number" min={0} className="pl-8" value={surgeryCharge} onChange={(e) => setSurgeryCharge(e.target.value)} disabled={saving} />
               </div>
-              {hospital === 'Other' && (
+              {hospital === 'Other' ? (
                 <p className="text-xs text-amber-600 dark:text-amber-400">+ ₹500 commission to Sadvichar</p>
+              ) : (
+                <p className="text-xs text-muted-foreground">No charge for Sadvichar Hospital (you work there).</p>
               )}
             </div>
           </div>

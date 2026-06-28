@@ -88,7 +88,11 @@ export function PatientForm({ onSaved }: PatientFormProps) {
     if (!village.trim()) e.village = 'Village name is required'
     if (!finalSurgery) e.surgeryName = 'Surgery name is required'
     if (!surgeryDate) e.surgeryDate = 'Surgery date is required'
-    if (!surgeryCharge || Number(surgeryCharge) < 0) e.surgeryCharge = 'Enter a valid charge'
+    // Charge is required ONLY for Other Hospital.
+    // For Sadvichar Hospital the charge is always 0 (you work there).
+    if (finalHospital === 'Other' && (!surgeryCharge || Number(surgeryCharge) < 0)) {
+      e.surgeryCharge = 'Surgery charge is required for Other Hospital'
+    }
     setErrors(e)
     if (Object.keys(e).length > 0) {
       toast.error('Please fill all required fields correctly.')
@@ -97,17 +101,21 @@ export function PatientForm({ onSaved }: PatientFormProps) {
 
     setSaving(true)
     try {
+      const finalCharge = finalHospital === 'Sadvichar' ? 0 : Number(surgeryCharge)
       const record = await createSurgery({
         patientName: patientName.trim(),
         village: village.trim(),
         surgeryName: finalSurgery,
         surgeryDate,
         hospital: finalHospital,
-        surgeryCharge: Number(surgeryCharge),
+        surgeryCharge: finalCharge,
         notes: notes.trim() || undefined,
       })
       toast.success('Patient record saved successfully.', {
-        description: `${record.patientName} · ${record.surgeryName} · ${record.hospital} Hospital`,
+        description:
+          finalHospital === 'Sadvichar'
+            ? `${record.patientName} · ${record.surgeryName} · Sadvichar Hospital (no charge)`
+            : `${record.patientName} · ${record.surgeryName} · Other Hospital · ₹500 commission`,
       })
       // Reset form
       setPatientName('')
@@ -259,7 +267,7 @@ export function PatientForm({ onSaved }: PatientFormProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="surgeryCharge">
-              Surgery Charge (₹) <span className="text-destructive">*</span>
+              Surgery Charge (₹) <span className="text-muted-foreground text-xs font-normal">— Other Hospital only</span>
             </Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">₹</span>
@@ -275,6 +283,9 @@ export function PatientForm({ onSaved }: PatientFormProps) {
                 disabled={saving}
               />
             </div>
+            <p className="text-xs text-muted-foreground">
+              No charge for Sadvichar Hospital (you work there). Required only for Other Hospital.
+            </p>
             {errors.surgeryCharge && <p className="text-xs text-destructive">{errors.surgeryCharge}</p>}
           </div>
           <div className="space-y-2">

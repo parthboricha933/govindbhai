@@ -8,7 +8,6 @@ import {
   BarChart3,
   Building2,
   LayoutDashboard,
-  LogOut,
   Moon,
   Plus,
   Printer,
@@ -18,8 +17,6 @@ import {
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
-import { getSession, logout } from '@/lib/api-client'
-import { LoginScreen } from '@/components/login-screen'
 import { PatientForm } from '@/components/patient-form'
 import { Dashboard } from '@/components/dashboard'
 import { RecordsTable } from '@/components/records-table'
@@ -46,9 +43,6 @@ const EMPTY_STATS: DashboardStats = {
 export default function Home() {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
-  const [authChecked, setAuthChecked] = React.useState(false)
-  const [authed, setAuthed] = React.useState(false)
-  const [username, setUsername] = React.useState<string | null>(null)
   const [tab, setTab] = React.useState<Tab>('home')
   const [analytics, setAnalytics] = React.useState<AnalyticsResponse | null>(null)
   const [loadingStats, setLoadingStats] = React.useState(false)
@@ -56,12 +50,6 @@ export default function Home() {
 
   React.useEffect(() => {
     setMounted(true)
-    ;(async () => {
-      const s = await getSession()
-      setAuthed(s.authenticated)
-      setUsername(s.username)
-      setAuthChecked(true)
-    })()
   }, [])
 
   const refreshStats = React.useCallback(async () => {
@@ -78,26 +66,15 @@ export default function Home() {
   }, [])
 
   React.useEffect(() => {
-    if (authed) refreshStats()
-  }, [authed, refreshStats])
+    refreshStats()
+  }, [refreshStats])
 
-  async function handleLogout() {
-    await logout()
-    setAuthed(false)
-    setUsername(null)
-    toast.success('Signed out.')
-  }
-
-  if (!authChecked || !mounted) {
+  if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="size-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     )
-  }
-
-  if (!authed) {
-    return <LoginScreen onLogin={(u) => { setAuthed(true); setUsername(u); toast.success(`Welcome back, ${u}!`) }} />
   }
 
   const stats = analytics?.dashboard ?? EMPTY_STATS
@@ -126,14 +103,6 @@ export default function Home() {
                 title="Toggle dark mode"
               >
                 {theme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
-              </Button>
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted text-xs">
-                <span className="text-muted-foreground">Admin:</span>
-                <span className="font-medium">{username}</span>
-              </div>
-              <Button variant="ghost" size="sm" onClick={handleLogout} title="Sign out">
-                <LogOut className="size-4" />
-                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
@@ -181,7 +150,7 @@ export default function Home() {
               <QuickStat label="Total Surgeries" value={stats.totalSurgeries.toLocaleString('en-IN')} icon={<Stethoscope className="size-4" />} />
               <QuickStat label="Sadvichar" value={stats.sadvicharSurgeries.toLocaleString('en-IN')} icon={<Activity className="size-4" />} accent="primary" />
               <QuickStat label="Other" value={stats.otherSurgeries.toLocaleString('en-IN')} icon={<Building2 className="size-4" />} accent="warning" />
-              <QuickStat label="Commission" value={`₹${stats.totalCommission.toLocaleString('en-IN')}`} icon={<BarChart3 className="size-4" />} accent="success" />
+              <QuickStat label="Cash Earned" value={`₹${stats.totalCommission.toLocaleString('en-IN')}`} icon={<BarChart3 className="size-4" />} accent="success" />
             </div>
           </div>
         )}
