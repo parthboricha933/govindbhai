@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Surgery {
+  id            String   @id @default(cuid())
+  patientName   String
+  village       String
+  surgeryName   String
+  surgeryDate   DateTime
+  hospital      String   // "Sadvichar" | "Other"
+  surgeryCharge Float    // in INR
+  commission    Float    // 500 for Other hospital, 0 for Sadvichar
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([surgeryDate])
+  @@index([hospital])
+  @@index([village])
+  @@index([surgeryName])
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
